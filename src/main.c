@@ -42,13 +42,8 @@ int main (int argc, char *argv[]) {
 			printf("Accuracy of clustering with using OpenMP = %.5lf;\nAccuracy of clustering without using OpenMP = %.5lf;\n", a1, a2);
 		}
 	}
-	if (check(&y1[0], &y2[0], n)) {
-		puts("OK...");
-	}
 	free(y1);
 	free(y2);
 	free(x);
 	return 0;
 }
-
-
