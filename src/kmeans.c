@@ -29,7 +29,7 @@ void elementaryAutoscaling(double *x, const int n, const int m, const int id) {
 void autoscalingOpenMP(double *x, const int n, const int m) {
 	int i;
 	omp_set_nested(0);
-#pragma omp parallel for simd shared(x, n, m) private(i)
+#pragma omp parallel for simd shared(x, m) firstprivate(n) private(i)
 	for (i = 0; i < m; i++) {
 		elementaryAutoscaling(x, n, m, i);
 	}
@@ -55,7 +55,7 @@ int getCluster(const double *x, const double *c, const int m, const int k) {
 void detCoresOpenMP(const double *x, double *c, const int *sn, const int k, const int m) {
 	int i;
 	omp_set_nested(0);
-#pragma omp parallel for simd shared(x, c, sn, m, k) private(i)
+#pragma omp parallel for simd shared(c, k) firstprivate(x, sn, m) private(i)
 	for (i = 0; i < k; i++) {
 		memcpy(&c[i * m], &x[sn[i] * m], m * sizeof(double));
 	}
@@ -71,7 +71,7 @@ void detStartSplittingSimple(const double *x, const double *c, int *y, int *nums
 void detStartSplittingOpenMP(const double *x, const double *c, int *y, int *nums, const int n, const int m, const int k) {
 	int i;
 	omp_set_nested(0);
-#pragma omp parallel for simd shared(nums, y, m, k) private(i, x, c)
+#pragma omp parallel for simd shared(nums, y, n) firstprivate(x, c, m, k) private(i)
 	for (i = 0; i < n; i++) {
 		detStartSplittingSimple(x, c, y, nums, m, k, i);
 	}
@@ -88,7 +88,7 @@ void simpleCalcCores(const double *x, double *c, const int *res, const int *nums
 void calcCoresOpenMP(const double *x, double *c, const int *y, const int *nums, const int n, const int m) {
 	int i;
 	omp_set_nested(0);
-#pragma omp parallel for simd shared(c, n, m, x, y, nums) private(i)
+#pragma omp parallel for simd shared(c, n) firstprivate(x, y, nums, m) private(i)
 	for (i = 0; i < n; i++) {
 		simpleCalcCores(x, c, y, nums, m, i);
 	}
@@ -106,7 +106,7 @@ int simpleCheckSplitting(const double *x, const double *c, int *res, int *nums, 
 char checkSplittingOpenMP(const double *x, const double *c, int *res, int *nums, const int n, const int m, const int k) {
 	int i, sum = 0;
 	omp_set_nested(0);
-#pragma omp parallel for simd shared(res, nums, n, m, k) private(x, c, i) reduction(+: sum)
+#pragma omp parallel for simd shared(res, nums, n) private(i) firstprivate(x, c, m, k) reduction(+: sum)
 	for (i = 0; i < n; i++) {
 		sum += simpleCheckSplitting(x, c, res, nums, m, k, i);
 	}
